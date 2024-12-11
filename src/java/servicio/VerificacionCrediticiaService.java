@@ -28,23 +28,23 @@ public class VerificacionCrediticiaService {
         TableroControl.incrementTotalRequests();
         String nombreCliente = getNombreCliente(idCliente);
         if (nombreCliente.equals("Desconocido")) {
-            TableroControl.incrementRejectedRequests();
+            TableroControl.incrementRejectedRequests("ID=" + idCliente);
             TableroControl.addRequestDetail("Verificar: " + idCliente + " - no encontrado");
             return "Usuario no encontrado en el sistema";
         }
         if (consultarBlackList(idCliente)) {
-            TableroControl.incrementRejectedRequests();
+            TableroControl.incrementRejectedRequests("ID=" + idCliente + ", Nombre=" + nombreCliente);
             TableroControl.addRequestDetail("Verificar: " + idCliente + " - en BlackList");
             return "Cliente " + nombreCliente + " está en la BlackList - Solicitud rechazada";
         }
 
         if (!consultarDataCredito(idCliente)) {
-            TableroControl.incrementRejectedRequests();
+            TableroControl.incrementRejectedRequests("ID=" + idCliente + ", Nombre=" + nombreCliente);
             TableroControl.addRequestDetail("Verificar: " + idCliente + " - no aprobado por DataCredito");
             return "Cliente " + nombreCliente + " no aprobado por DataCredito - Solicitud rechazada";
         }
 
-        TableroControl.incrementAcceptedRequests();
+        TableroControl.incrementAcceptedRequests("ID=" + idCliente + ", Nombre=" + nombreCliente);
         TableroControl.addRequestDetail("Verificar: " + idCliente + " - aprobado");
         return "Cliente " + nombreCliente + " aprobado - Verificación exitosa";
     }
@@ -120,7 +120,7 @@ public class VerificacionCrediticiaService {
 
         try {
             message.setFrom(new InternetAddress(remitente));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress("miguesanti0808@gmail.com"));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(destinatario));
             message.setSubject("Resultado de Verificación Crediticia");
             message.setText(mensaje);
             Transport transport = session.getTransport("smtp");
